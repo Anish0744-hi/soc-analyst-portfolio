@@ -1,0 +1,5 @@
+index=security EventResult="Failed"
+| bin _time span=5m
+| stats count as failed_attempts by _time user src_ip
+| where failed_attempts >= 5
+| sort - failed_attempts
