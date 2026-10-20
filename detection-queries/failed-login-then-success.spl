@@ -1,0 +1,8 @@
+
+index=security (EventResult="Failed" OR EventResult="Success")
+| eval is_failure=if(EventResult="Failed",1,0)
+| eval is_success=if(EventResult="Success",1,0)
+| sort 0 _time
+| streamstats time_window=5m sum(is_failure) as failures_in_window by user src_ip
+| where is_success=1 AND failures_in_window>=3
+| table _time user src_ip failures_in_window
