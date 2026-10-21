@@ -37,3 +37,24 @@ Generate an alert because four failed attempts were followed by a successful log
 
 ## Analyst Conclusion
 The activity is suspicious and warrants investigation. The available events alone do not confirm account compromise.
+## Test Cases
+
+The following test cases use fictional login events to evaluate the detection logic. The threshold is at least three failed logins followed by a successful login within five minutes, using the same username and source IP.
+
+| Test | Login activity | Expected result | Reason |
+|---|---|---|---|
+| 1 | Alex has 3 failures, then 1 success within 3 minutes from the same IP. | Alert | The threshold is met. |
+| 2 | Sam has 2 failures, then 1 success within 2 minutes from the same IP. | No alert | Fewer than 3 failures. |
+| 3 | Alex has 3 failures, then a success 10 minutes later. | No alert | The failures are outside the preceding 5-minute window. |
+| 4 | Alex has 3 failures from one IP, then a success from a different IP. | No alert from this rule | The username and source IP do not both match. A separate detection could investigate this pattern. |
+
+### Validation Status
+
+These are manually reasoned test cases, not results from a live SIEM. The SPL query still needs to be tested against sample events in Splunk before being considered validated.
+
+### Limitations
+
+- Legitimate users who mistype passwords may trigger similar patterns.
+- Shared networks, VPNs, and NAT can affect source-IP interpretation.
+- A matching alert indicates suspicious activity, not confirmed account compromise.
+- The time window and field names must be checked against the actual log source.
